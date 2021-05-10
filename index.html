@@ -2,68 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Virtual World</title>
-    <meta name="Virtual_World_from_Suraj" content="Ubuntu_gnome_look" />
-    <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
+    <title>Suraj S</title>
+    <meta name="Suraj website" content="index" />
+    <script src="assets/js/three.js"></script>
   </head>
   <body>
-    <a-scene>
-      <a-sky src="static/ubuntu18_04.jpg"></a-sky>
-      <a-assets>
-        
-        <a-asset-item
-          id="terminal"
-          src="static/terminal.gltf"
-        >
-        </a-asset-item>
-
-        <a-asset-item
-          id="firefox"
-          src="static/firefox.gltf"
-        >
-        </a-asset-item>
-
-      </a-assets>
-      
-      <a-entity id="parent" position="0 1 -5">
-        
-        <a-entity id="child1"
-         rotation="0 -45 0"
-         position="-7 1 -0.7">
-          <a-gltf-model src="#terminal"></a-gltf-model>
-        </a-entity>
-        
-        <!--
-        
-          <a-entity id="child2"
-         rotation="0 -90 0"
-         position="2 1 0">
-          <a-gltf-model src="#firefox"></a-gltf-model>
-        </a-entity>
-
-        -->
-
-        <a-entity id="child3"
-        position="0 0.5 4.4">
-          <a-plane
-          width="1"
-          height="0.7"
-          src="static/aboutscreen.png"
-          shadow
-        ></a-plane>
-      </a-entity>
-
-      </a-entity>
-      
-      <a-plane
-        position="0 0 -4"
-        rotation="-90 0 0"
-        width="12"
-        height="5"
-        src="static/index.png"
-        shadow
-      ></a-plane>
-
-    </a-scene>
+    <script src="assets/js/jarus.js"></script>
   </body>
 </html>
