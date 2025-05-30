@@ -1,237 +1,239 @@
 import * as THREE from "./three.module.js";
-import RandomTriangles from "./triangles.js";
 
-/*
-COLORS
-0xF1F4FF - silver
-0xA2A2A1 - gray 1
-0xFFFFFF - white
-0x202020 - gray 2
-0xFF2020 - kinda red
-0x4040FF - kinda blue
-0x00C040 - kinda green
-*/
+// Create loading screen
+const loadingScreen = document.getElementById('loading-screen');
 
-// CONSTANTS
-var X1, X3, Y1, Y3;
+// COLORS
+const COLORS = {
+  silver: 0xF1F4FF,
+  gray1: 0xA2A2A1,
+  white: 0xFFFFFF,
+  gray2: 0x202020,
+  red: 0xFF4040,
+  blue: 0x4040FF,
+  green: 0x00C040
+};
 
-// MEDIA QUERY
-/*
-function mquery(q){
-    if (q.matches){
-        X1 = 0;
-        X3 = 0;
-        Y1 = -6;
-        Y3 = 6;
-        console.log("<800");
-    }
-    else{
-        X1 = -6;
-        X3 = 6;
-        Y1 = 0;
-        Y3 = 0;
-        console.log(">800");
-    }
-}
-*/
-X1 = -6;
-X3 = 6;
-Y1 = 0;
-Y3 = 0;
-//var q = window.matchMedia("(min-width: 800px)");
-//mquery(q);
-
-// light
-const light1 = new THREE.DirectionalLight( 0xFFFFFF, 1 );
-light1.position.set( -1, 2, 5);
-const light2 = new THREE.PointLight( 0xFFFFFF, 1 );
-light2.position.set( -1, 2, 5);
-
-// scene
+// Scene setup
 const scene = new THREE.Scene();
-scene.add(light2);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.z = 10;
 
-// camera
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 500 );
+// Lighting
+const ambientLight = new THREE.AmbientLight(COLORS.white, 0.4);
+scene.add(ambientLight);
+
+const light1 = new THREE.DirectionalLight(COLORS.white, 0.8);
+light1.position.set(-1, 2, 5);
 camera.add(light1);
 
+const light2 = new THREE.PointLight(COLORS.white, 0.6);
+light2.position.set(-1, 2, 5);
+scene.add(light2);
+scene.add(camera);
+
 // Renderer
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-renderer.setClearColor( 0x202020, 1);
-document.body.appendChild( renderer.domElement );
-renderer.domElement.style.position = "absolute";
-renderer.domElement.style.top = "0px";
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(COLORS.gray2, 1);
+document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-// Canvas
-const ctx1 = document.createElement('canvas').getContext('2d');
-ctx1.canvas.width = 250;
-ctx1.canvas.height = 50;
-ctx1.fillStyle = "#FF4040";
-ctx1.fillRect(0, 0, ctx1.canvas.width, ctx1.canvas.height);
-ctx1.fillStyle = "#202020";
-ctx1.font = "40px Itim";
-ctx1.fillText("About Myself",15,35);
+// Track active section
+let activeSection = null;
 
-const ctx2 = document.createElement('canvas').getContext('2d');
-ctx2.canvas.width = 250;
-ctx2.canvas.height = 50;
-ctx2.fillStyle = "#4040FF";
-ctx2.fillRect(0, 0, ctx2.canvas.width, ctx2.canvas.height);
-ctx2.fillStyle = "#202020";
-ctx2.font = "40px Itim";
-ctx2.fillText("My Works",15,35);
+// Mouse movement tracking
+const mouse = {
+  x: 0,
+  y: 0,
+  lastMoved: Date.now()
+};
 
-const ctx3 = document.createElement('canvas').getContext('2d');
-ctx3.canvas.width = 250;
-ctx3.canvas.height = 50;
-ctx3.fillStyle = "#00C040";
-ctx3.fillRect(0, 0, ctx3.canvas.width, ctx3.canvas.height);
-ctx3.fillStyle = "#202020";
-ctx3.font = "40px Itim";
-ctx3.fillText("Contact me",15,35);
-
-camera.position.z = 5;
-
-// Textures
-const texture1 = new THREE.CanvasTexture(ctx1.canvas);
-texture1.needsUpdate = true;
-const texture2 = new THREE.CanvasTexture(ctx2.canvas);
-texture2.needsUpdate = true;
-const texture3 = new THREE.CanvasTexture(ctx3.canvas);
-texture3.needsUpdate = true;
-
-// Geometries
-const planegeo1 = new THREE.PlaneGeometry( 5, 1 );
-const planegeo2 = new THREE.PlaneGeometry( 5, 1 );
-const planegeo3 = new THREE.PlaneGeometry( 5, 1 );
-
-// Materials
-const planematerial1 = new THREE.MeshPhongMaterial( { map: texture1 } );
-const lmaterial1 = new THREE.MeshPhongMaterial( { color: 0xFF4040 } )
-const planematerial2 = new THREE.MeshPhongMaterial( { map: texture2 } );
-const lmaterial2 = new THREE.MeshPhongMaterial( { color: 0x4040FF } )
-const planematerial3 = new THREE.MeshPhongMaterial( { map: texture3 } );
-const lmaterial3 = new THREE.MeshPhongMaterial( { color: 0x00C040 } )
-
-// Meshs
-const planemesh1 = new THREE.Mesh( planegeo1, planematerial1 );
-planemesh1.name = "about";
-scene.add( planemesh1 );
-planemesh1.position.set(X1,Y1,-2);
-
-const planemesh2 = new THREE.Mesh( planegeo2, planematerial2 );
-planemesh2.name = "work";
-scene.add( planemesh2 );
-planemesh2.position.set(0,0,-2);
-
-const planemesh3 = new THREE.Mesh( planegeo3, planematerial3 );
-planemesh3.name = "contact";
-scene.add( planemesh3 );
-planemesh3.position.set(X3,Y3,-2);
-
-const triangles1 = new RandomTriangles( X1, Y1, -4.6, 200, 5, lmaterial1, scene );
-triangles1.createTriangles();
-
-const triangles2 = new RandomTriangles( 0, 0, -4.6, 200, 5, lmaterial2, scene );
-triangles2.createTriangles();
-
-const triangles3 = new RandomTriangles( X3, Y3, -4.6, 200, 5, lmaterial3, scene );
-triangles3.createTriangles();
-
-var active_ray = [planemesh1, planemesh2, planemesh3];
-var mouse = { x: -1.0, y: -1.0 };
-var pickedObj;
-var spread_count = [0,0,0];
-const spreaderx = [...Array(200)].map(_=>(Math.random()-0.5));
-const spreadery = [...Array(200)].map(_=>(Math.random()-0.5));
-
-const raycaster = new THREE.Raycaster();
-
-function expander(triangles){
-    for (let i = 0; i < triangles.mesh_arr.length; i++) {
-        triangles.mesh_arr[i].position.x += spreaderx[i];
-        triangles.mesh_arr[i].position.y += spreadery[i];
-        //mesh_arr1[i].rotation.y += 0.005;
-    }
-}
-
-function shrinker(triangles){
-    for (let i = 0; i < triangles.mesh_arr.length; i++) {
-        triangles.mesh_arr[i].position.x -= spreaderx[i];
-        triangles.mesh_arr[i].position.y -= spreadery[i];
-    }
-}
-
-function onMouseMove( event ) {
-	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-}
-
-function clearPickPosition() {
-    mouse.x = -100.0;
-    mouse.y = -100.0;
-}
-
-function animate() {
-    requestAnimationFrame( animate );
+// Simple particles function that works reliably
+function createParticles() {
+  const particleCount = 1500;
+  const particles = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+  
+  for (let i = 0; i < particleCount * 3; i += 3) {
+    // Create a sphere distribution for stars
+    const radius = 50;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
     
-    raycaster.setFromCamera( mouse, camera );
-    const intersectedObjs = raycaster.intersectObjects(active_ray);
-
-    if (intersectedObjs.length){
-        pickedObj = intersectedObjs[0].object;
-        if (pickedObj.name==="about"){
-            if (spread_count[0]<40){
-                expander(triangles1);
-                spread_count[0]+=1;
-            }
-        }
-        else if (pickedObj.name==="work"){
-            if (spread_count[1]<40){
-                expander(triangles2);
-                spread_count[1]+=1;
-            }
-        }
-        else if (pickedObj.name==="contact"){
-            if (spread_count[2]<40){
-                expander(triangles3);
-                spread_count[2]+=1;
-            }
-        }
-    }
-    else{
-        if (spread_count[0]>0){
-            shrinker(triangles1);
-            spread_count[0]-=1;
-        }
-        else if (spread_count[1]>0){
-            shrinker(triangles2);
-            spread_count[1]-=1;
-        }
-        else if (spread_count[2]>0) {
-            shrinker(triangles3);
-            spread_count[2]-=1;
-        }
-    }
-    texture1.needsUpdate = true;
-    texture2.needsUpdate = true;
-    texture3.needsUpdate = true;
-	renderer.render( scene, camera );
+    positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+    positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+    positions[i + 2] = radius * Math.cos(phi);
+  }
+  
+  particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  
+  const particleMaterial = new THREE.PointsMaterial({
+    color: 0xFFFFFF,
+    size: 0.2,
+    transparent: true,
+    opacity: 0.8
+  });
+  
+  const particleSystem = new THREE.Points(particles, particleMaterial);
+  scene.add(particleSystem);
+  
+  return particleSystem;
 }
 
-window.addEventListener('mousemove', onMouseMove);
-window.addEventListener('mouseout', clearPickPosition);
-window.addEventListener('mouseleave', clearPickPosition);
+const particles = createParticles();
 
-window.addEventListener('touchstart', (event) => {
-// prevent the window from scrolling
-event.preventDefault();
-onMouseMove(event.touches[0]);
-}, {passive: false});
-window.addEventListener('touchmove', (event) => {
-    onMouseMove(event.touches[0]);
+// Handle section activation
+function activateSection(sectionId, buttonId) {
+  // Reset buttons
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Activate clicked button
+  document.getElementById(buttonId).classList.add('active');
+  
+  // Hide all content sections
+  document.querySelectorAll('.section-content').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  // Show content immediately
+  document.getElementById(sectionId).classList.add('active');
+  
+  // Store active section
+  if (sectionId === 'about-content') {
+    activeSection = 'about';
+  } else if (sectionId === 'work-content') {
+    activeSection = 'work';
+  } else if (sectionId === 'contact-content') {
+    activeSection = 'contact';
+  }
+}
+
+// Event listeners for navigation buttons
+document.getElementById('about-btn').addEventListener('click', () => {
+  activateSection('about-content', 'about-btn');
 });
-window.addEventListener('touchend', clearPickPosition);
 
+document.getElementById('work-btn').addEventListener('click', () => {
+  activateSection('work-content', 'work-btn');
+});
+
+document.getElementById('contact-btn').addEventListener('click', () => {
+  activateSection('contact-content', 'contact-btn');
+});
+
+// Mouse move event listener
+document.addEventListener('mousemove', (event) => {
+  // Update mouse position (normalized from -1 to 1)
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -((event.clientY / window.innerHeight) * 2 - 1);
+  
+  // Update last moved timestamp
+  mouse.lastMoved = Date.now();
+  
+  // Update cursor position
+  cursor.style.left = event.clientX + 'px';
+  cursor.style.top = event.clientY + 'px';
+  
+  // Follower has slight delay for nice effect
+  setTimeout(() => {
+    cursorFollower.style.left = event.clientX + 'px';
+    cursorFollower.style.top = event.clientY + 'px';
+  }, 50);
+});
+
+// Animation loop
+function animate() {
+  requestAnimationFrame(animate);
+  
+  const currentTime = Date.now();
+  const timeSinceLastMove = currentTime - mouse.lastMoved;
+  
+  // If mouse has moved in the last 2 seconds, respond to mouse position
+  if (timeSinceLastMove < 2000) {
+    // Calculate target rotation based on mouse position
+    const targetRotationX = mouse.y * 0.5;
+    const targetRotationY = mouse.x * 0.5;
+    
+    // Smoothly interpolate current rotation to target rotation
+    particles.rotation.x += (targetRotationX - particles.rotation.x) * 0.05;
+    particles.rotation.y += (targetRotationY - particles.rotation.y) * 0.05;
+    
+    // Add slight parallax effect by moving particles based on mouse position
+    particles.position.x += (mouse.x * 0.5 - particles.position.x) * 0.02;
+    particles.position.y += (mouse.y * 0.5 - particles.position.y) * 0.02;
+  } else {
+    // Resume automatic rotation after 2 seconds of inactivity
+    particles.rotation.y += 0.0005;
+    
+    // Gentle wave motion
+    particles.rotation.x = Math.sin(currentTime * 0.0003) * 0.1;
+    
+    // Reset position slowly to center
+    particles.position.x *= 0.98;
+    particles.position.y *= 0.98;
+  }
+  
+  renderer.render(scene, camera);
+}
+
+// Custom cursor
+const cursor = document.querySelector('.cursor');
+const cursorFollower = document.querySelector('.cursor-follower');
+
+// Change cursor style on interactive elements
+document.querySelectorAll('button, a').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '15px';
+    cursor.style.height = '15px';
+    cursor.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    cursorFollower.style.width = '40px';
+    cursorFollower.style.height = '40px';
+    cursorFollower.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+  });
+  
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '10px';
+    cursor.style.height = '10px';
+    cursor.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+    cursorFollower.style.width = '30px';
+    cursorFollower.style.height = '30px';
+    cursorFollower.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+  });
+});
+
+// Handle window resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Hide loading screen after everything is loaded
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    loadingScreen.classList.add('fade-out');
+    setTimeout(() => {
+      loadingScreen.remove();
+    }, 500);
+  }, 1000);
+});
+
+// Handle touch devices
+if ('ontouchstart' in window) {
+  document.querySelector('.cursor').style.display = 'none';
+  document.querySelector('.cursor-follower').style.display = 'none';
+  
+  // Use touch events to update mouse position for particle movement
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 0) {
+      mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -((e.touches[0].clientY / window.innerHeight) * 2 - 1);
+      mouse.lastMoved = Date.now();
+    }
+  });
+}
+
+// Start animation
 animate();
